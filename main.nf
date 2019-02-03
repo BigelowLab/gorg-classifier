@@ -37,6 +37,7 @@ log.info("GORG Annotations   (.tsv)         : ${params.gorg_annotations}")
 log.info("Output directory                  : ${params.outdir}")
 log.info("Kaiju mismatches                  : ${params.kaiju_mismatches}")
 log.info("Kaiju minimum alignment length    : ${params.kaiju_min_length}")
+log.info("Kaiju CPUs                        : ${params.cpus}")
 log.info("\n")
 
 // instantiate files
@@ -59,7 +60,6 @@ Channel
 
 process run_kaiju {
     tag "$sample"
-    publishDir "${params.outdir}/kaiju", mode: 'copy'
     cpus params.cpus
     memory 16.GB
 
@@ -79,7 +79,6 @@ process run_kaiju {
 
 process add_taxonomy {
     tag "$sample"
-    publishDir path: "${params.outdir}/kaiju", mode: "copy"
 
     input:
     set sample, file(hits) from kaiju_hits
