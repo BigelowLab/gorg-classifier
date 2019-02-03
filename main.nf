@@ -69,7 +69,7 @@ process run_kaiju {
     file kaiju_index
 
     output:
-    tuple("$sample", file("${sample}_hits.txt")) into kaiju_hits
+    set sample, file("${sample}_hits.txt" into kaiju_hits
 
     script:
     """
@@ -87,7 +87,7 @@ process add_taxonomy {
     file names
 
     output:
-    tuple("$sample", file("${sample}_hits_names.txt")) into assigned_taxonomies
+    set sample, file("${sample}_hits_names.txt") into assigned_taxonomies
 
     script:
     """
@@ -104,7 +104,7 @@ process add_functions {
     file gorg_annotations
 
     output:
-    tuple("$sample", file("${sample}_annotated.txt.gz")) into assigned_functions
+    set sample, file("${sample}_annotated.txt.gz") into assigned_functions
 
     script:
     """
