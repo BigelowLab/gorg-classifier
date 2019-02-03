@@ -1,0 +1,9 @@
+name: bigelowlab-gorg-classifier-1.0
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - gawk
+  - python=2.7.15
+  - kaiju=1.6.3
