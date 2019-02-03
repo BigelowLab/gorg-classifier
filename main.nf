@@ -69,7 +69,7 @@ process run_kaiju {
     file kaiju_index
 
     output:
-    set sample, file("${sample}_hits.txt" into kaiju_hits
+    set sample, file("${sample}_hits.txt") into kaiju_hits
 
     script:
     """
