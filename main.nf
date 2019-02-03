@@ -43,7 +43,7 @@ log.info("\n")
 nodes = file(params.nodes)
 names = file(params.names)
 kaiju_index = file(params.kaiju_index)
-gorg_annotations = file(gorg_annotations)
+gorg_annotations = file(params.gorg_annotations)
 
 // check file existence
 if( !nodes.exists() ) { exit 1, "Missing taxonomy nodes: ${nodes}" }
