@@ -30,6 +30,36 @@
     + The minimum alignment length threshold for kaiju alignments
     + Defaults to 11
 
+## Example
+
+Install Nextflow
+
+```
+curl -s https://get.nextflow.io | bash
+```
+
+With Docker or Singularity:
+
+```
+nextflow run BigelowLab/gorg-classifier -latest -profile docker \
+    --seqs '/data/*.fastq' \
+    --nodes /GORG/NCBI/nodes.dmp \
+    --names /GORG/NCBI/names.dmp \
+    --kaiju_index /GORG/GORG_v1_NCBI.fmi \
+    --gorg_annotations /GORG/GORG_v1.tsv
+```
+
+With dependencies (kaiju, awk, and python) installed locally:
+
+```
+nextflow run BigelowLab/gorg-classifier -latest \
+    --seqs '/data/*.fastq' \
+    --nodes /GORG/NCBI/nodes.dmp \
+    --names /GORG/NCBI/names.dmp \
+    --kaiju_index /GORG/GORG_v1_NCBI.fmi \
+    --gorg_annotations /GORG/GORG_v1.tsv
+```
+
 ## Outputs
 
 The final annotated sequences are available in `./results/annotations/${sample}_annotated.txt.gz`. The columns
