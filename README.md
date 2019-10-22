@@ -12,7 +12,7 @@
     + File path to names.dmp
 + `--kaiju_index`
     + File path to kaiju index (ends with .fmi)
-+ `--gorg_annotations`
++ `--annotations`
     + File path to GORG functional annotations (ends with .tsv)
 
 ## Optional parameters
@@ -46,7 +46,7 @@ nextflow run BigelowLab/gorg-classifier -latest -profile docker \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
     --kaiju_index /GORG/GORG_v1_NCBI.fmi \
-    --gorg_annotations /GORG/GORG_v1.tsv
+    --annotations /GORG/GORG_v1.tsv
 ```
 
 With dependencies (kaiju, awk, and python) installed locally:
@@ -57,7 +57,7 @@ nextflow run BigelowLab/gorg-classifier -latest \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
     --kaiju_index /GORG/GORG_v1_NCBI.fmi \
-    --gorg_annotations /GORG/GORG_v1.tsv
+    --annotations /GORG/GORG_v1.tsv
 ```
 
 ## Outputs
