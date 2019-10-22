@@ -98,10 +98,12 @@ corresponds to a given taxonomy, e.g. SILVAmod (CREST) or NCBI.
 
 The final result for an entry within the faa is:
 
+```
 >AG-313-D02_NODE_48;2006;2149_62672
 MQLKHPLGKELLFIISIRIRLLRDEYSLGFKTIEQPAAIAEDIFVRV
+```
 
-Breaking down '>AG-313-D02_NODE_48;2006;2149_62672' gives us:
+Breaking down `>AG-313-D02_NODE_48;2006;2149_62672` gives us:
 
 ```
 AG-313-D02_NODE_48 <- the contig ID
