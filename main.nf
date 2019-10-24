@@ -133,14 +133,16 @@ process add_taxonomy {
     file names
 
     output:
-    set sample, file("${sample}_hits_names.txt") into assigned_taxonomies
+    set sample, file("${sample}_hits_names.txt.gz") into assigned_taxonomies
 
     script:
     """
     kaiju-addTaxonNames -t $nodes -n $names -i $hits -o ${sample}_hits_names.txt \
         -r superkingdom,phylum,class,order,family,genus,species
+    gzip ${sample}_hits_names.txt
     """
 }
+
 
 process add_functions {
     tag "$sample"
@@ -154,10 +156,9 @@ process add_functions {
     set sample, file("${sample}_annotated.txt.gz") into assigned_functions
 
     script:
-    """
-    awk 'BEGIN{{FS=IFS=OFS="\t"}} NR==FNR {{a[\$1";"\$5";"\$6]=\$8 FS \$11 FS \$9 FS \$12 FS \$10 FS \$13 FS \$14 FS \$15 FS \$16 FS \$17 FS \$18;next}}{{split(\$6, contigs, ","); print \$0 FS a[contigs[1]] }}' $annotations $hits | gzip > ${sample}_annotated.txt.gz
-    """
+    template 'add_functions.py'
 }
+
 
 process summarize_annotations {
     tag "$sample"
