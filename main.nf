@@ -80,6 +80,8 @@ log.info """
     Kaiju mismatches                  : ${params.mismatches}
     Kaiju minimum alignment length    : ${params.minlength}
     Kaiju CPUs                        : ${params.cpus}
+    -----------------------------------------------------------------------
+
     """.stripIndent()
 
 // instantiate files
@@ -135,7 +137,7 @@ process add_taxonomy {
 
     script:
     """
-    addTaxonNames -t $nodes -n $names -i $hits -o ${sample}_hits_names.txt \
+    kaiju-addTaxonNames -t $nodes -n $names -i $hits -o ${sample}_hits_names.txt \
         -r superkingdom,phylum,class,order,family,genus,species
     """
 }
