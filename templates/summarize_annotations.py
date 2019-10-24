@@ -15,14 +15,17 @@ levels = ["superkingdom", "phylum", "class", "order", "family", "genus", "specie
 
 summaries = Counter()
 with gzopen(hits_file) as in_fh, open(results_file, "w") as out_fh:
-    reader = csv.reader(in_fh, delimiter="\t")
+    reader = csv.reader(in_fh, delimiter="\\t")
+
     for i, row in enumerate(reader):
         if row[0] == "U":
             continue
-        for assignment, level in zip(row[7].split("; "), levels):
-            if assignment == "NA":
+        for assignment, level in zip(row[7].split(";"), levels):
+            if assignment.strip() == "NA":
                 continue
             summaries.update([level])
+
+        # prokka and swissprot gene, EC, and product
         if row[8] or row[9] or row[10] or row[11] or row[12] or row[13]:
             summaries.update(["function"])
             hypothetical = False
@@ -31,11 +34,14 @@ with gzopen(hits_file) as in_fh, open(results_file, "w") as out_fh:
                     hypothetical = True
             if not hypothetical:
                 summaries.update(["nonhypothetical"])
-        if row[10] or row[11]:
+
+        # prokka ec, swissprot ec
+        if row[9] or row[12]:
             summaries.update(["ec"])
+
     print("Sequences: ", i, file=out_fh)
     i = i / 100.0
-    print("Tax assignments", file=out_fh)
+    print("Taxonomy assignments", file=out_fh)
     print(" Superkingdom:", summaries["superkingdom"], "(%.2f%%)" % (summaries["superkingdom"] / i), file=out_fh)
     print(" Phylum:", summaries["phylum"], "(%.2f%%)" % (summaries["phylum"] / i), file=out_fh)
     print(" Class:", summaries["class"], "(%.2f%%)" % (summaries["class"] / i), file=out_fh)
