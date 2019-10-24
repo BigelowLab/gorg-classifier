@@ -10,7 +10,7 @@
     + File path to nodes.dmp
 + `--names`
     + File path to names.dmp
-+ `--kaiju_index`
++ `--fmi`
     + File path to kaiju index (ends with .fmi)
 + `--annotations`
     + File path to GORG functional annotations (ends with .tsv)
@@ -23,10 +23,10 @@
 + `--cpus`
     + CPUs allocated to `kaiju`
     + Defaults to 8
-+ `--kaiju_mismatches`
++ `--mismatches`
     + The number of mismatches allowed in a kaiju alignment
     + Defaults to 3
-+ `--kaiju_min_length`
++ `--minlength`
     + The minimum alignment length threshold for kaiju alignments
     + Defaults to 11
 
@@ -45,7 +45,7 @@ nextflow run BigelowLab/gorg-classifier -latest -profile docker \
     --seqs '/data/*.fastq' \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
-    --kaiju_index /GORG/GORG_v1_NCBI.fmi \
+    --fmi /GORG/GORG_v1_NCBI.fmi \
     --annotations /GORG/GORG_v1.tsv
 ```
 
@@ -56,9 +56,12 @@ nextflow run BigelowLab/gorg-classifier -latest \
     --seqs '/data/*.fastq' \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
-    --kaiju_index /GORG/GORG_v1_NCBI.fmi \
+    --fmi /GORG/GORG_v1_NCBI.fmi \
     --annotations /GORG/GORG_v1.tsv
 ```
+
+The index, `GORG_v1_NCBI.fmi` or `GORG_v1_CREST.fmi`, must be paired with their respective
+taxonomy metadata files (`names.dmp` and `nodes.dmp`) included with the reference data.
 
 ## Outputs
 
@@ -141,6 +144,6 @@ $ nextflow run BigelowLab/gorg-classifier \
     --seqs 'data/*.fq' \
     --nodes NCBI/nodes.dmp \
     --names NCBI/names.dmp \
-    --kaiju_index GORG_v1_NCBI_custom.fmi \
+    --fmi GORG_v1_NCBI_custom.fmi \
     --annotations GORG_v1_custom.tsv
 ```

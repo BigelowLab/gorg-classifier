@@ -22,7 +22,7 @@ if (params.help) {
         File path to nodes.dmp
     --names
         File path to names.dmp
-    --kaiju_index
+    --fmi
         File path to kaiju index (ends with .fmi)
     --annotations
         File path to GORG functional annotations (ends with .tsv)
@@ -35,10 +35,10 @@ if (params.help) {
     --cpus
         CPUs allocated to `kaiju`
         Default: 8
-    --kaiju_mismatches
+    --mismatches
         The number of mismatches allowed in a kaiju alignment
         Default: 3
-    --kaiju_min_length
+    --minlength
         The minimum alignment length threshold for kaiju alignments
         Default: 11
 
@@ -54,8 +54,8 @@ params.nodes = false
 if( !params.nodes ) { exit 1, "--nodes is not defined" }
 params.names = false
 if( !params.names ) { exit 1, "--names is not defined" }
-params.kaiju_index = false
-if( !params.kaiju_index ) { exit 1, "--kaiju_index is not defined" }
+params.fmi = false
+if( !params.fmi ) { exit 1, "--fmi is not defined" }
 params.annotations = false
 if( !params.annotations ) { exit 1, "--annotations is not defined" }
 
@@ -74,24 +74,24 @@ log.info """
     Sequences          (*.fq/*.fna)   : ${params.seqs}
     Nodes              (nodes.dmp)    : ${params.nodes}
     Names              (names.dmp)    : ${params.names}
-    Kaiju Index        (.fmi)         : ${params.kaiju_index}
+    Kaiju Index        (.fmi)         : ${params.fmi}
     GORG Annotations   (.tsv)         : ${params.annotations}
     Output directory                  : ${params.outdir}
-    Kaiju mismatches                  : ${params.kaiju_mismatches}
-    Kaiju minimum alignment length    : ${params.kaiju_min_length}
+    Kaiju mismatches                  : ${params.mismatches}
+    Kaiju minimum alignment length    : ${params.minlength}
     Kaiju CPUs                        : ${params.cpus}
     """.stripIndent()
 
 // instantiate files
 nodes = file(params.nodes)
 names = file(params.names)
-kaiju_index = file(params.kaiju_index)
+fmi = file(params.fmi)
 annotations = file(params.annotations)
 
 // check file existence
 if( !nodes.exists() ) { exit 1, "Missing taxonomy nodes: ${nodes}" }
 if( !names.exists() ) { exit 1, "Missing taxonomy names: ${names}" }
-if( !kaiju_index.exists() ) { exit 1, "Missing kaiju index: ${kaiju_index}" }
+if( !fmi.exists() ) { exit 1, "Missing kaiju index: ${fmi}" }
 if( !annotations.exists() ) { exit 1, "Missing GORG annotations: ${annotations}" }
 
 
@@ -108,15 +108,15 @@ process run_kaiju {
     input:
     set sample, file(sequences) from sequence_files
     file nodes
-    file kaiju_index
+    file fmi
 
     output:
     set sample, file("${sample}_hits.txt") into kaiju_hits
 
     script:
     """
-    kaiju -z ${task.cpus} -v -m ${params.kaiju_min_length} \
-        -e ${params.kaiju_mismatches} -t $nodes -f $kaiju_index \
+    kaiju -z ${task.cpus} -v -m ${params.minlength} \
+        -e ${params.mismatches} -t $nodes -f $fmi \
         -i $sequences -o ${sample}_hits.txt
     """
 }
