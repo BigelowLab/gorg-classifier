@@ -46,7 +46,7 @@ nextflow run BigelowLab/gorg-classifier -latest -profile docker \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
     --fmi /GORG/GORG_v1_NCBI.fmi \
-    --annotations /GORG/GORG_v1.tsv
+    --annotations /GORG/GORG_v1.tsv.gz
 ```
 
 With dependencies (kaiju, awk, and python) installed locally:
@@ -57,7 +57,7 @@ nextflow run BigelowLab/gorg-classifier -latest \
     --nodes /GORG/NCBI/nodes.dmp \
     --names /GORG/NCBI/names.dmp \
     --fmi /GORG/GORG_v1_NCBI.fmi \
-    --annotations /GORG/GORG_v1.tsv
+    --annotations /GORG/GORG_v1.tsv.gz
 ```
 
 The index, `GORG_v1_NCBI.fmi` or `GORG_v1_CREST.fmi`, must be paired with their respective
