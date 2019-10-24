@@ -77,10 +77,10 @@ are defined as:
 + protein sequence
 + taxonomic lineage
 + prokka gene
-+ swissprot gene
 + prokka EC
-+ swissprot EC
 + prokka product
++ swissprot gene
++ swissprot EC
 + swissprot product
 + eggNOG
 + KO
