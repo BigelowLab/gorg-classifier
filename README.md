@@ -30,6 +30,14 @@
     + The minimum alignment length threshold for kaiju alignments
     + Defaults to 11
 
+## Reference data
+
+GORG reference materials can be downloaded from our OSF repo under Files/OSF Storage/gorg-tropics.
+
+URL: https://osf.io/pcwj9/files/
+
+The references are released under Attribution-NonCommercial 4.0 International.
+
 ## Example
 
 Install Nextflow
