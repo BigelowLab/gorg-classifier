@@ -1,5 +1,9 @@
 # GORG Classifier
 
+## Citation
+
+> Pachiadaki, M. G., Brown, J. M., Brown, J., Bezuidt, O., Berube, P. M., Biller, S. J., Poulton, N. J., Burkart, M. D., Clair, J. J. L., Chisholm, S. W., et al. (2019). Charting the Complexity of the Marine Microbiome through Single-Cell Genomics. Cell. https://doi.org/10.1016/j.cell.2019.11.017
+
 # Usage
 
 ## Required arguments
