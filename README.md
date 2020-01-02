@@ -1,19 +1,30 @@
 # GORG Classifier
 
+## Citation
+
+> Pachiadaki, M. G., Brown, J. M., Brown, J., Bezuidt, O., Berube, P. M., Biller, S. J., Poulton, N. J., Burkart, M. D., Clair, J. J. L., Chisholm, S. W., et al. (2019). Charting the Complexity of the Marine Microbiome through Single-Cell Genomics. Cell. https://doi.org/10.1016/j.cell.2019.11.017
+
 # Usage
+
+Install [Nextflow](https://www.nextflow.io/):
+
+```
+curl -s https://get.nextflow.io | bash
+```
+
+Annotate with GORG NCBI taxonomy using Docker or Singularity to handle dependencies:
+
+```
+nextflow run BigelowLab/gorg-classifier -profile docker \
+    --seqs '/data/*.fastq'
+```
+
+Altering `--mode` you can use our CREST annotated taxonomy.
 
 ## Required arguments
 
 + `--seqs`
     + File path with wildcard(s) of your sequence files, e.g. "/data/*.fastq.gz"
-+ `--nodes`
-    + File path to nodes.dmp
-+ `--names`
-    + File path to names.dmp
-+ `--fmi`
-    + File path to kaiju index (ends with .fmi)
-+ `--annotations`
-    + File path to GORG functional annotations (ends with .tsv)
 
 ## Optional parameters
 
@@ -30,63 +41,40 @@
     + The minimum alignment length threshold for kaiju alignments
     + Defaults to 11
 
-## Example
+## Reference data
 
-Install Nextflow
+GORG reference materials can be downloaded from our OSF repo under Files/OSF Storage/gorg-tropics.
 
-```
-curl -s https://get.nextflow.io | bash
-```
+URL: https://osf.io/pcwj9/files/
 
-With Docker or Singularity:
+The references are released under Attribution-NonCommercial 4.0 International.
 
-```
-nextflow run BigelowLab/gorg-classifier -latest -profile docker \
-    --seqs '/data/*.fastq' \
-    --nodes /GORG/NCBI/nodes.dmp \
-    --names /GORG/NCBI/names.dmp \
-    --fmi /GORG/GORG_v1_NCBI.fmi \
-    --annotations /GORG/GORG_v1.tsv.gz
-```
+## Local mode
 
-With dependencies (kaiju, awk, and python) installed locally:
+If your compute environment lacks an internet connection, you may specify local
+downloads for reference data after setting `--mode local`. See `--help` for more
+details.
 
-```
-nextflow run BigelowLab/gorg-classifier -latest \
-    --seqs '/data/*.fastq' \
-    --nodes /GORG/NCBI/nodes.dmp \
-    --names /GORG/NCBI/names.dmp \
-    --fmi /GORG/GORG_v1_NCBI.fmi \
-    --annotations /GORG/GORG_v1.tsv.gz
-```
++ `--nodes`
+    + File path to nodes.dmp
++ `--names`
+    + File path to names.dmp
++ `--fmi`
+    + File path to kaiju index (ends with .fmi)
++ `--annotations`
+    + File path to GORG functional annotations (ends with .tsv)
 
 The index, `GORG_v1_NCBI.fmi` or `GORG_v1_CREST.fmi`, must be paired with their respective
 taxonomy metadata files (`names.dmp` and `nodes.dmp`) included with the reference data.
 
 ## Outputs
 
-The final annotated sequences are available in `./results/annotations/${sample}_annotated.txt.gz`. The columns
-are defined as:
+The final annotated sequences are available in `./results/annotations/${sample}_annotated.txt.gz`.
+Column headers are added onto the annotations file.
 
-+ status - classified ("C") or unclassified ("U")
-+ sequence ID
-+ taxonomy ID
-+ length
-+ taxonomy IDs used in LCA
-+ sequence IDs used in the LCA
-+ protein sequence
-+ taxonomic lineage
-+ prokka gene
-+ prokka EC
-+ prokka product
-+ swissprot gene
-+ swissprot EC
-+ swissprot product
-+ eggNOG
-+ KO
-+ Pfam
-+ CAZy
-+ TIGRFAMs
+Per sample summary data is collected in `.results/summaries/${sample}_summary.txt` and contains
+a breakdown of counts per taxonomy and number of functional assignments.
+
 
 # Updating the reference
 

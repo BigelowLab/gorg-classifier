@@ -9,6 +9,11 @@ if (params.help) {
 
     #### Homepage / Documentation
     https://github.com/BigelowLab/gorg-classifier
+    #### Citation
+    https://doi.org/10.1016/j.cell.2019.11.017
+    #### Reference data
+    URL: https://osf.io/pcwj9
+    License: Attribution-NonCommercial 4.0 International.
     #### Authors
     Joe Brown <brwnjm@gmail.com>
     -----------------------------------------------------------------------
@@ -18,17 +23,13 @@ if (params.help) {
     --seqs
         File path with wildcard(s) of your sequence files,
         e.g. "/data/*.fastq.gz"
-    --nodes
-        File path to nodes.dmp
-    --names
-        File path to names.dmp
-    --fmi
-        File path to kaiju index (ends with .fmi)
-    --annotations
-        File path to GORG functional annotations (ends with .tsv)
 
     Optional parameters
 
+    --mode
+        One of 'ncbi', 'crest', or 'local'. Downloads references
+        and annotates using respective reference files
+        Default: 'ncbi'
     --outdir
         Directory, existing or not, into which the output is written
         Default: './results'
@@ -42,6 +43,17 @@ if (params.help) {
         The minimum alignment length threshold for kaiju alignments
         Default: 11
 
+    Local mode
+
+    --nodes
+        File path to nodes.dmp
+    --names
+        File path to names.dmp
+    --fmi
+        File path to kaiju index (ends with .fmi)
+    --annotations
+        File path to GORG functional annotations (ends with .tsv)
+
     -----------------------------------------------------------------------
     """.stripIndent()
     exit 0
@@ -49,15 +61,46 @@ if (params.help) {
 
 // required arguments
 params.seqs = false
-if( !params.seqs ) { exit 1, "--seqs is not defined" }
+// local mode
 params.nodes = false
-if( !params.nodes ) { exit 1, "--nodes is not defined" }
-params.names = false
-if( !params.names ) { exit 1, "--names is not defined" }
-params.fmi = false
-if( !params.fmi ) { exit 1, "--fmi is not defined" }
 params.annotations = false
-if( !params.annotations ) { exit 1, "--annotations is not defined" }
+params.names = false
+params.fmi = false
+
+if (!params.seqs) { exit 1, "--seqs is not defined" }
+if (params.mode == "local") {
+    if (!params.nodes) { exit 1, "--nodes is not defined" }
+    if (!params.names) { exit 1, "--names is not defined" }
+    if (!params.fmi) { exit 1, "--fmi is not defined" }
+    if (!params.annotations) { exit 1, "--annotations is not defined" }
+
+    nodes = file(params.nodes)
+    names = file(params.names)
+    fmi = file(params.fmi)
+    annotations = file(params.annotations)
+
+    // check file existence
+    if( !nodes.exists() ) { exit 1, "Missing taxonomy nodes: ${nodes}" }
+    if( !names.exists() ) { exit 1, "Missing taxonomy names: ${names}" }
+    if( !fmi.exists() ) { exit 1, "Missing kaiju index: ${fmi}" }
+    if( !annotations.exists() ) { exit 1, "Missing GORG annotations: ${annotations}" }
+}
+else if(params.mode == "ncbi") {
+    // future file versioning will look like: ?action=download&amp;version=1&amp;direct
+    fmi = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12d0946b571000d064725")
+    annotations = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12a440db187000e3afd8a")
+    names = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12d3146b571000b0663af")
+    nodes = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12d3446b571000d06473b")
+
+}
+else if(params.mode == "crest") {
+    fmi = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12c74743c23000c9ed206")
+    annotations = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12a440db187000e3afd8a")
+    names = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12d0c743c23000a9ee2bf")
+    nodes = file("https://files.osf.io/v1/resources/pcwj9/providers/osfstorage/5db12d0b46b571000e06e7a8")
+} else {
+    exit 1, "--mode must be one of 'ncbi', 'crest', or 'local'"
+}
 
 log.info """
 
@@ -67,15 +110,21 @@ log.info """
 
     #### Homepage / Documentation
     https://github.com/BigelowLab/gorg-classifier
+    #### Citation
+    https://doi.org/10.1016/j.cell.2019.11.017
+    #### Reference data
+    URL: https://osf.io/pcwj9
+    License: Attribution-NonCommercial 4.0 International.
     #### Authors
     Joe Brown <brwnjm@gmail.com>
     -----------------------------------------------------------------------
 
     Sequences          (*.fq/*.fna)   : ${params.seqs}
-    Nodes              (nodes.dmp)    : ${params.nodes}
-    Names              (names.dmp)    : ${params.names}
-    Kaiju Index        (.fmi)         : ${params.fmi}
-    GORG Annotations   (.tsv)         : ${params.annotations}
+    Mode                              : ${params.mode}
+    Nodes              (nodes.dmp)    : ${nodes}
+    Names              (names.dmp)    : ${names}
+    Kaiju Index        (.fmi)         : ${fmi}
+    GORG Annotations   (.tsv)         : ${annotations}
     Output directory                  : ${params.outdir}
     Kaiju mismatches                  : ${params.mismatches}
     Kaiju minimum alignment length    : ${params.minlength}
@@ -83,18 +132,6 @@ log.info """
     -----------------------------------------------------------------------
 
     """.stripIndent()
-
-// instantiate files
-nodes = file(params.nodes)
-names = file(params.names)
-fmi = file(params.fmi)
-annotations = file(params.annotations)
-
-// check file existence
-if( !nodes.exists() ) { exit 1, "Missing taxonomy nodes: ${nodes}" }
-if( !names.exists() ) { exit 1, "Missing taxonomy names: ${names}" }
-if( !fmi.exists() ) { exit 1, "Missing kaiju index: ${fmi}" }
-if( !annotations.exists() ) { exit 1, "Missing GORG annotations: ${annotations}" }
 
 
 Channel
