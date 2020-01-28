@@ -12,12 +12,20 @@ Install [Nextflow](https://www.nextflow.io/):
 curl -s https://get.nextflow.io | bash
 ```
 
-Annotate with GORG NCBI taxonomy using Docker or Singularity to handle dependencies:
+Annotate with GORG NCBI taxonomy using Docker to handle dependencies:
 
 ```
 nextflow run BigelowLab/gorg-classifier -profile docker \
     --seqs '/data/*.fastq'
 ```
+
+Or Singularity:
+
+```
+nextflow run BigelowLab/gorg-classifier -profile singularity \
+    --seqs '/data/*.fastq'
+```
+
 
 Altering `--mode` you can use our CREST annotated taxonomy.
 
