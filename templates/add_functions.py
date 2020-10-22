@@ -12,7 +12,7 @@ results_file = sample + "_annotated.txt.gz"
 
 
 def gzopen(path):
-    if path.endswith(".gz") or mode != "local":
+    if path.endswith(".gz"):
         return gzip.open(path, "rt")
     else:
         return open(path)
