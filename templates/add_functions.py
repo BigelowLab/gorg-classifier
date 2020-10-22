@@ -11,8 +11,8 @@ annotations_file = "$annotations"
 results_file = sample + "_annotated.txt.gz"
 
 
-def gzopen(path):
-    if path.endswith(".gz"):
+def gzopen(path, mode="remote"):
+    if path.endswith(".gz") or mode != "local":
         return gzip.open(path, "rt")
     else:
         return open(path)
@@ -21,7 +21,7 @@ def gzopen(path):
 annotations = {}
 # annotation headers, including additional of a custom database
 keep = []
-with gzopen(annotations_file) as fh:
+with gzopen(annotations_file, mode=mode) as fh:
     header = fh.readline().strip().split("\\t")
     fh.seek(0)
     keep = header[7:]
