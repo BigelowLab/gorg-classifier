@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-from __future__ import print_function
+
 import csv
 import gzip
+import sys
 
 from collections import Counter
 
@@ -12,10 +13,22 @@ results_file = sample + "_summary.txt"
 
 gzopen = lambda f: gzip.open(f, "rt") if f.endswith(".gz") else open(f)
 levels = ["superkingdom", "phylum", "class", "order", "family", "genus", "species"]
+required = ["prokka_gene", "prokka_EC_number", "prokka_product", "swissprot_gene", "swissprot_EC_number", "swissprot_project"]
 
 summaries = Counter()
+
+def standard_database(observed, expected):
+    for o in observed:
+        if o not in expected:
+            return False
+    return True
+
 with gzopen(hits_file) as in_fh, open(results_file, "w") as out_fh:
     reader = csv.DictReader(in_fh, delimiter="\\t")
+
+    if not standard_database(reader.fieldnames, required):
+        print("custom databases without the expected columns are not supported in the summary function", file=out_fh)
+        sys.exit(0)
 
     for i, row in enumerate(reader):
         if row["status"] == "U":
