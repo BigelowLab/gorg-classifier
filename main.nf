@@ -1,4 +1,4 @@
-#!/usr/bin/env nextflow
+nextflow.enable.dsl=2
 
 params.help = false
 if (params.help) {
@@ -134,29 +134,24 @@ log.info """
     """.stripIndent()
 
 
-Channel
-    .fromPath(params.seqs, checkIfExists: true)
-    .map { file -> tuple(file.baseName.split("\\.")[0], file) }
-    .set { sequence_files }
-
-
 process run_kaiju {
     tag "$sample"
     cpus params.cpus
 
     input:
-    set sample, file(sequences) from sequence_files
-    file nodes
-    file fmi
+    tuple val(sample), path(r1), path(r2)
+    path(nodes)
+    path(fmi)
 
     output:
-    set sample, file("${sample}_hits.txt") into kaiju_hits
+    tuple val(sample), path("${sample}_hits.txt")
 
     script:
+    def r2path = r2 ? "-j ${r2}" : ""
     """
     kaiju -z ${task.cpus} -v -m ${params.minlength} \
         -e ${params.mismatches} -t $nodes -f $fmi \
-        -i $sequences -o ${sample}_hits.txt
+        -i ${r1} ${r2path} -o ${sample}_hits.txt
     """
 }
 
@@ -165,16 +160,16 @@ process add_taxonomy {
     tag "$sample"
 
     input:
-    set sample, file(hits) from kaiju_hits
-    file nodes
-    file names
+    tuple val(sample), path(hits)
+    path(nodes)
+    path(names)
 
     output:
-    set sample, file("${sample}_hits_names.txt.gz") into assigned_taxonomies
+    tuple val(sample), path("${sample}_hits_names.txt.gz")
 
     script:
     """
-    kaiju-addTaxonNames -t $nodes -n $names -i $hits -o ${sample}_hits_names.txt \
+    kaiju-addTaxonNames -t ${nodes} -n ${names} -i ${hits} -o ${sample}_hits_names.txt \
         -r superkingdom,phylum,class,order,family,genus,species
     gzip ${sample}_hits_names.txt
     """
@@ -186,11 +181,11 @@ process add_functions {
     publishDir path: "${params.outdir}/annotations"
 
     input:
-    set sample, file(hits) from assigned_taxonomies
-    file annotations
+    tuple val(sample), path(hits)
+    path(annotations)
 
     output:
-    set sample, file("${sample}_annotated.txt.gz") into assigned_functions
+    tuple val(sample), path("${sample}_annotated.txt.gz")
 
     script:
     template 'add_functions.py'
@@ -200,13 +195,30 @@ process add_functions {
 process summarize_annotations {
     tag "$sample"
     publishDir path: "${params.outdir}/summaries"
+    cache false
 
     input:
-    set sample, file(hits) from assigned_functions
+    tuple val(sample), path(hits)
 
     output:
-    file("${sample}_summary.txt")
+    path("${sample}_summary.txt")
 
     script:
     template 'summarize_annotations.py'
+}
+
+
+workflow {
+    seqs = Channel
+        .fromFilePairs(params.seqs, size: -1, checkIfExists: true, flat: true)
+        .map { it ->
+            if (it.size == 2) {
+                it.add([])
+            }
+            return it
+        }
+    run_kaiju(seqs, nodes, fmi)
+    add_taxonomy(run_kaiju.out, nodes, names)
+    add_functions(add_taxonomy.out, annotations)
+    summarize_annotations(add_functions.out)
 }
