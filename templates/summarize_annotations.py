@@ -13,13 +13,13 @@ results_file = sample + "_summary.txt"
 
 gzopen = lambda f: gzip.open(f, "rt") if f.endswith(".gz") else open(f)
 levels = ["superkingdom", "phylum", "class", "order", "family", "genus", "species"]
-required = ["prokka_gene", "prokka_EC_number", "prokka_product", "swissprot_gene", "swissprot_EC_number", "swissprot_project"]
+required = ["prokka_gene", "prokka_EC_number", "prokka_product", "swissprot_gene", "swissprot_EC_number", "swissprot_product"]
 
 summaries = Counter()
 
 def standard_database(observed, expected):
-    for o in observed:
-        if o not in expected:
+    for e in expected:
+        if e not in observed:
             return False
     return True
 

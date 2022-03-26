@@ -48,12 +48,8 @@ with gzopen(hits_file) as in_fh, gzip.open(results_file, "wt") as out_fh:
     print(*output_header, sep="\\t", file=out_fh)
 
     for line in in_fh:
-        toks = line.strip().split("\\t")
-        # with names, there are 8 columns
-        # then add the length of `keep` to maintain rectangular table
-        if toks[0] == "U":
-            toks.extend([""] * extend_length)
-        else:
+        toks = line.strip("\\r\\n").split("\\t")
+        if toks[0] != "U":
             contig_id = toks[5].partition(",")[0]
             toks.extend(annotations[contig_id])
         print(*toks, sep="\\t", file=out_fh)

@@ -34,6 +34,15 @@ Altering `--mode` you can use our CREST annotated taxonomy.
 + `--seqs`
     + File path with wildcard(s) of your sequence files, e.g. "/data/*.fastq.gz"
 
+## Paired-end data
+
+The pattern above ("/data/*.fastq.gz") works on single-end data and will treat
+pair-end data as single end. For paired-end mode use a pattern such as:
+
+```
+--seqs "/data/*_{1,2}.fastq.gz"
+```
+
 ## Optional parameters
 
 + `--outdir`
