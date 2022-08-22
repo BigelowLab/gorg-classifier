@@ -93,16 +93,20 @@ Per sample summary data is collected in `.results/summaries/${sample}_summary.tx
 a breakdown of counts per taxonomy and number of functional assignments.
 
 
-# Updating the reference
+# Updating or creating a new reference
 
-We use Prokka to annotate contigs as it gives us reasonable annotations, an
-faa, and a gff. From there we use AA sequences and design the header to
-contain the contig ID, the start, and end of the AA within the context of
-the contig. This is used to link kaiju alignments to the remainder of the
-AA annotation.
+At SCGC, we start out with assembled contigs that tend to have headers labeled as SPAdes
+output, like:
+
+>AG-313-A04_NODE_1
+
+Those contigs are run through Prokka to pull out genes and annotate. We use the resultant
+amino acid sequences and design the header to contain the contig ID, the start, and end 
+of the sequence within the context of the contig. This is used to link kaiju alignments 
+to the remainder of the AA annotation.
 
 The header's final detail is the lowest taxonomic identifier which
-corresponds to a given taxonomy, e.g. SILVAmod (CREST) or NCBI.
+corresponds to a given taxonomy, e.g. SILVAmod (CREST), NCBI, or your custom taxonomic reference.
 
 The final result for an entry within the faa is:
 
@@ -120,18 +124,51 @@ AG-313-D02_NODE_48 <- the contig ID
 62672              <- most specific taxonomic assignment
 ```
 
-After you update your headers, append them onto the GORG .faa and
-create your kaiju index using tools available in the kaiju toolset.
-For NCBI's taxonomy, this would look like:
+## Adding a new taxonomic hierarchy
+
+The identity of the most specific taxononic assignment is specific to any given 
+reference database and links this contig to the reference. Each reference will 
+require a separate, annotated .faa, like we're already providing for CREST and
+NCBI.
+
+Say we wanted to create a new reference from GTDB, we would need to first convert
+their taxonomy to a Kaiju compatible hierarchical tree -- names.dmp and nodes.dmp
+format. One could likely do this using something like:
+
+https://github.com/shenwei356/gtdb-taxdump
+
+With your contigs annotated to the above tax IDs, annotate your existing Prokka
+.faa file with these new IDs, and supply `gorg-classifier` the custom taxdump.
 
 ```
-$ mkbwt -n 8 -a protein -o GORG_v1_NCBI_custom GORG_v1_NCBI_custom.faa
-$ mkfmi -r rm GORG_v1_NCBI_custom
+$ nextflow run BigelowLab/gorg-classifier \
+    -latest -profile docker \
+    --seqs 'data/*.fq' \
+    --nodes custom-gtdb/nodes.dmp \
+    --names custom-gtdb/names.dmp \
+    --fmi custom_seqs_GTDB.fmi \
+    --annotations custom_seqs.tsv
 ```
 
-The final piece is appending your functional annotations onto GORG_v1.tsv.
-Matching to Kaiju hits is done using contig_id, start, and stop. Empty cells
-are okay, but extra columns would be cut off.
+## Creating the index
+
+After you update your headers to include to contig_id, start, end, and most specific
+taxonomic assignment, concatenate everything into a single .faa file to
+create your kaiju index. We use the tools available in the kaiju toolset to build
+this reference. See: 
+
+https://github.com/bioinformatics-centre/kaiju
+
+```
+$ mkbwt -n 8 -a protein -o custom_seqs_NCBI custom_seqs_NCBI.faa
+$ mkfmi -r rm custom_seqs_NCBI
+```
+
+The final piece in updating the GORG reference or creating your own, is updating the
+functional annotations into something like GORG_v1.tsv. Matching to Kaiju hits is done 
+using contig_id, start, and stop. Empty cells are okay and custom headers beyond strand (see [here](https://github.com/BigelowLab/gorg-classifier/blob/master/templates/add_functions.py#L27))
+will be used to annotate, but altering keys outside of the keys below will result in the
+summary function not working properly (see [here](https://github.com/BigelowLab/gorg-classifier/blob/master/templates/summarize_annotations.py#L42)).
 
 Example of the GORG_v1.tsv:
 
@@ -140,7 +177,7 @@ contig_id	sag	ncbi_id	crest_id	start	stop	strand	prokka_gene	prokka_EC_number	pr
 AG-313-D02_NODE_48	AG-313-D02	62672	2547	2006	2149	-			hypothetical protein			hypothetical protein
 ```
 
-Now using your index, the taxonomic annotations, and your functional
+Using your index, the taxonomic annotations, and your functional
 annotations, run the classifier against your sequences:
 
 ```
@@ -149,6 +186,6 @@ $ nextflow run BigelowLab/gorg-classifier \
     --seqs 'data/*.fq' \
     --nodes NCBI/nodes.dmp \
     --names NCBI/names.dmp \
-    --fmi GORG_v1_NCBI_custom.fmi \
-    --annotations GORG_v1_custom.tsv
+    --fmi custom_seqs_NCBI.fmi \
+    --annotations custom_seqs.tsv
 ```
