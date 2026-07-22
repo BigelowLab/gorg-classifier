@@ -70,8 +70,8 @@ The references are released under Attribution-NonCommercial 4.0 International.
 
 ## Local mode
 
-If your compute environment lacks an internet connection, you may specify local
-downloads for reference data after setting `--mode local`. See `--help` for more
+If your compute environment lacks an internet connection, or you want to use a local database, 
+you may specify local downloads for reference data after setting `--mode local`. See `--help` for more
 details.
 
 + `--nodes`
