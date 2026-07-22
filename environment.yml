@@ -5,5 +5,5 @@ channels:
   - defaults
 dependencies:
   - gawk
-  - python=2.7.15
-  - kaiju=1.6.3
+  - python=3.7
+  - kaiju=1.9.0

@@ -27,7 +27,7 @@ with gzopen(annotations_file, mode=mode) as fh:
     keep = header[7:]
     reader = csv.DictReader(fh, delimiter="\\t")
     for row in reader:
-        annotations[f"{row['contig_id']};{row['start']};{row['stop']}"] = [
+        annotations[f"{row['contig_id']};{int(float(row['start']))};{int(float(row['stop']))}"] = [
             row[i] for i in keep
         ]
 
